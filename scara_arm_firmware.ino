@@ -1,6 +1,8 @@
+//develop, DO NOT COMMIT TO MAIN
 #include <Stepper.h>
 #include <math.h>
 const int stepsPerRevolution = 2048; // for stepper motor 28BYJ-48 
+
 // Initialize stepper motors
 Stepper motor1(stepsPerRevolution, 22, 24, 23, 25);
 Stepper motor2(stepsPerRevolution, 26, 28, 27, 29);
@@ -9,16 +11,21 @@ Stepper motor3(stepsPerRevolution, 30, 32, 31, 33);
 //initializing electronic locking variables
 long motor1_position = 0;
 long motor2_position = 0;
+long motor3_position = 0;
 
 //function prototypes 
 bool inverseKinematics(float x, float y, float L1, float L2, float &theta1, float &theta2);
 void moveMotors(long s1, long s2, long s3);
 void moveTo(float x, float y, float L1, float L2);
 long degToSteps(float degrees);
+long zToSteps(float z);
 
 //constants
 float L1 = 11.7; // 11.7 cm from base pivot axis to joint pivot axis
 float L2 = 10.7; // 10.7 cm from joint pivot axis to end effector
+
+const long verticalMinSteps = zToSteps(-5); // sets how far below neutral the end effector can move; -5 cm
+const long verticalMaxSteps = zToSteps(5);
 
 //setup function, establishes distances between pivot points
 void setup() {
@@ -27,26 +34,26 @@ void setup() {
   motor3.setSpeed(10);
 
   // calibrate to starting position (0,10)
-  moveTo(0, 10, L1, L2);
+  moveTo(0, 10, 0, L1, L2);
   delay(1000);
 }
 
 //main loop, runs the two solutions repeatedly. may need to create a more robust way to select one or the other depending on the current trial
 void loop() {
   // first test, moves a block from (-10,10) to (10,10)
-  moveTo(-10, 10, L1, L2);
+  moveTo(-10, 10, 0, L1, L2);
   delay(500);
-  moveTo(10, 10, L1, L2);
+  moveTo(10, 10, 0, L1, L2);
   delay(500);
-  moveTo(0, 10, L1, L2);
+  moveTo(0, 10, 0, L1, L2);
   delay(1000);
 
   // second test (TBC, don't know second task)
-  moveTo(-5, 15, L1, L2);
+  moveTo(-5, 15, 0, L1, L2);
   delay(500);
-  moveTo(5, 15, L1, L2);
+  moveTo(5, 15, 0, L1, L2);
   delay(500);
-  moveTo(0, 10, L1, L2);
+  moveTo(0, 10, 0, L1, L2);
   delay(1000);
 }
 
@@ -65,8 +72,8 @@ bool inverseKinematics(float x, float y, float L1, float L2, float &theta1, floa
   return true;
 }
 
-//function to move the arm to coordinates (x,y)
-void moveTo(float x, float y, float L1, float L2) {
+//function to move the arm to coordinates (x,y,z) ADDED VERTICAL MOTION
+void moveTo(float x, float y, float z, float L1, float L2) {
   float t1, t2;
   if (!inverseKinematics(x, y, L1, L2, t1, t2)) {
     return;
@@ -79,8 +86,9 @@ void moveTo(float x, float y, float L1, float L2) {
   // Convert to steps
   long s1 = degToSteps(deg1);
   long s2 = degToSteps(deg2);
+  long s3 = zToSteps(z);
 
-  moveMotors(s1 - motor1_position, s2 - motor2_position, 0);  // delta movement
+  moveMotors(s1 - motor1_position, s2 - motor2_position, s3 - motor3_position);  // delta movement
 }
 
 // Custom function to move all motors concurrently coordinating the steps.
@@ -140,13 +148,23 @@ void moveMotors(long s1, long s2, long s3) {
     }
 
  if ((i * steps3) / maxSteps > stepCounter3) {
-    motor3.step(dir3);
-    stepCounter3++;
+    long next_position = motor3_position + dir3;
+    if (next_position >= verticalMinSteps && next_position <= verticalMaxSteps) {
+      motor3.step(dir3);
+      motor3_position = next_position;
+    }
+      stepCounter3++;
  }
- delay(2); //The motors might skip steps if the change is too fast. This delay helps with it.
+ delay(2); 
  }
 }
 
 long degToSteps(float degrees) {
   return (long)((degrees / 360.0) * stepsPerRevolution);
+}
+
+long zToSteps(float z) {
+  const float cmPerRev = 0; //TBD
+  const float stepsPerCm = stepsPerRevolution / cmPerRev;
+  return (long)(z*stepsPerCm);
 }
