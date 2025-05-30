@@ -164,7 +164,7 @@ long degToSteps(float degrees) {
 }
 
 long zToSteps(float z) {
-  const float cmPerRev = 0; //TBD
+  const float cmPerRev = 8.85; //distance the gear rack moves on one full rotation of the pinion gear
   const float stepsPerCm = stepsPerRevolution / cmPerRev;
   return (long)(z*stepsPerCm);
 }
