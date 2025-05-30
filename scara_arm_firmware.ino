@@ -1,0 +1,152 @@
+#include <Stepper.h>
+#include <math.h>
+const int stepsPerRevolution = 2048; // for stepper motor 28BYJ-48 
+// Initialize stepper motors
+Stepper motor1(stepsPerRevolution, 22, 24, 23, 25);
+Stepper motor2(stepsPerRevolution, 26, 28, 27, 29);
+Stepper motor3(stepsPerRevolution, 30, 32, 31, 33);
+
+//initializing electronic locking variables
+long motor1_position = 0;
+long motor2_position = 0;
+
+//function prototypes 
+bool inverseKinematics(float x, float y, float L1, float L2, float &theta1, float &theta2);
+void moveMotors(long s1, long s2, long s3);
+void moveTo(float x, float y, float L1, float L2);
+long degToSteps(float degrees);
+
+//constants
+float L1 = 11.7; // 11.7 cm from base pivot axis to joint pivot axis
+float L2 = 10.7; // 10.7 cm from joint pivot axis to end effector
+
+//setup function, establishes distances between pivot points
+void setup() {
+  motor1.setSpeed(10);
+  motor2.setSpeed(10);
+  motor3.setSpeed(10);
+
+  // calibrate to starting position (0,10)
+  moveTo(0, 10, L1, L2);
+  delay(1000);
+}
+
+//main loop, runs the two solutions repeatedly. may need to create a more robust way to select one or the other depending on the current trial
+void loop() {
+  // first test, moves a block from (-10,10) to (10,10)
+  moveTo(-10, 10, L1, L2);
+  delay(500);
+  moveTo(10, 10, L1, L2);
+  delay(500);
+  moveTo(0, 10, L1, L2);
+  delay(1000);
+
+  // second test (TBC, don't know second task)
+  moveTo(-5, 15, L1, L2);
+  delay(500);
+  moveTo(5, 15, L1, L2);
+  delay(500);
+  moveTo(0, 10, L1, L2);
+  delay(1000);
+}
+
+//IK function, implements trigonometry of inverse kinematics
+bool inverseKinematics(float x, float y, float L1, float L2, float &theta1, float &theta2) {
+  float dist = sqrt(x*x + y*y);
+  if (dist > L1 + L2 || dist < abs(L1 - L2)) return false; // unreachable
+
+  float cos_theta2 = (x*x + y*y - L1*L1 - L2*L2) / (2 * L1 * L2);
+  theta2 = acos(cos_theta2);
+
+  float k1 = L1 + L2 * cos(theta2);
+  float k2 = L2 * sin(theta2);
+  theta1 = atan2(y, x) - atan2(k2, k1);
+
+  return true;
+}
+
+//function to move the arm to coordinates (x,y)
+void moveTo(float x, float y, float L1, float L2) {
+  float t1, t2;
+  if (!inverseKinematics(x, y, L1, L2, t1, t2)) {
+    return;
+  }
+
+  // Convert radians to degrees
+  float deg1 = t1 * 180.0 / PI;
+  float deg2 = t2 * 180.0 / PI;
+
+  // Convert to steps
+  long s1 = degToSteps(deg1);
+  long s2 = degToSteps(deg2);
+
+  moveMotors(s1 - motor1_position, s2 - motor2_position, 0);  // delta movement
+}
+
+// Custom function to move all motors concurrently coordinating the steps.
+//The function receives the target values for each motor
+void moveMotors(long s1, long s2, long s3) {
+ long steps1 = abs(s1); //This function uses the absolute value to calculate how many steps at a time should move each motor
+ long steps2 = abs(s2);
+ long steps3 = abs(s3);
+//These three variables will have the direction of rotation
+ int dir1;
+ int dir2;
+ int dir3;
+ //If the target is positive, the direction variable is 1
+//If the target is negative, the direction variable is -1
+ if (s1 >= 0) {
+ dir1 = 1;
+ } else {
+ dir1 = -1;
+ }
+ if (s2 >= 0) {
+ dir2 = 1;
+ } else {
+ dir2 = -1;
+ }
+ if (s3 >= 0) {
+ dir3 = 1;
+ } else {
+ dir3 = -1;
+ }
+//To coordinate the movement of the motors we need to identify the largest target (absolute value)
+//This line of code identifies the largest value of steps2, and steps 3. Then it identifies the largest value of that value and steps 1.
+ long maxSteps = max(steps1, max(steps2, steps3));
+//This part of the code is what coordinates the motion to make it smooth and at the same time.
+//The for loop will execute the number of times indicated by the maximum target value.
+//For each motor, divide the target number of steps for the motor by the max target.
+ long stepCounter1=0;
+ long stepCounter2=0;
+ long stepCounter3=0;
+ for (int i = 0; i < maxSteps; i++) {
+  
+ if ((i * steps1) / maxSteps > stepCounter1) {
+      // motor1 position check
+      if ((motor1_position + dir1) <= 768 && (motor1_position + dir1) >= -768) {
+        motor1.step(dir1);
+        motor1_position += dir1;
+      }
+      stepCounter1++;
+    }
+
+ if ((i * steps2) / maxSteps > stepCounter2) {
+    // motor1 position check
+      if ((motor2_position + dir2) <= 768 && (motor2_position + dir2) >= -768) {
+        motor2.step(dir2);
+        motor2_position += dir2;
+      }
+      stepCounter2++;
+    }
+
+ if ((i * steps3) / maxSteps > stepCounter3) {
+    motor3.step(dir3);
+    stepCounter3++;
+ }
+ delay(2); //The motors might skip steps if the change is too fast. This delay helps with it.
+ }
+}
+
+long degToSteps(float degrees) {
+  return (long)((degrees / 360.0) * stepsPerRevolution);
+}
