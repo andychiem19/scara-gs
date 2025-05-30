@@ -1,4 +1,4 @@
-# SCARA Robot Arm README // ENGR 113
+# SCARA Robot Arm // ENGR 113
 
 **moveMotors** is a function that coordinates the simultaneous movement of all three stepper motors;
 

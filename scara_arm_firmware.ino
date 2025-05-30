@@ -1,4 +1,3 @@
-//develop, DO NOT COMMIT TO MAIN
 #include <Stepper.h>
 #include <math.h>
 const int stepsPerRevolution = 2048; // for stepper motor 28BYJ-48 
@@ -24,7 +23,7 @@ long zToSteps(float z);
 float L1 = 11.7; // 11.7 cm from base pivot axis to joint pivot axis
 float L2 = 10.7; // 10.7 cm from joint pivot axis to end effector
 
-const long verticalMinSteps = zToSteps(-5); // sets how far below neutral the end effector can move; -5 cm
+const long verticalMinSteps = zToSteps(-18); // sets how far below neutral the end effector can move; -5 cm
 const long verticalMaxSteps = zToSteps(5);
 
 //setup function, establishes distances between pivot points
@@ -164,7 +163,7 @@ long degToSteps(float degrees) {
 }
 
 long zToSteps(float z) {
-  const float cmPerRev = 0; //TBD
+  const float cmPerRev = 8.85; //distance the gear rack moves on one full rotation of the pinion gear
   const float stepsPerCm = stepsPerRevolution / cmPerRev;
   return (long)(z*stepsPerCm);
 }
