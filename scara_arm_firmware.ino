@@ -39,21 +39,21 @@ void setup() {
 
 //main loop, runs the two solutions repeatedly. may need to create a more robust way to select one or the other depending on the current trial
 void loop() {
-  // first test, moves a block from (-10,10) to (10,10)
-  moveTo(-10, 10, 0, L1, L2);
+  // first test, moves a block from (in inches) (-2,2)
+  moveTo(-5.08, 15.08, 0, L1, L2); // moves above first cube, which is 5.08 cm above and to the left of the starting point
   delay(500);
-  moveTo(10, 10, 0, L1, L2);
+  moveTo(7.62, 15.08, 0, L1, L2); // moves it 12.7 cm to the right (5 in) (3,2)
   delay(500);
-  moveTo(0, 10, 0, L1, L2);
-  delay(1000);
+  moveTo(0, 10, 0, L1, L2); // recalibrate
+  delay(5000);
 
-  // second test (TBC, don't know second task)
-  moveTo(-5, 15, 0, L1, L2);
+  // second test 
+  moveTo(-7.62, 20.16, 0, L1, L2); // moves above first cube, which is 10.16 cm above and to the left of the starting point
   delay(500);
-  moveTo(5, 15, 0, L1, L2);
+  moveTo(7.62, 20.16, 0, L1, L2); // moves it 15.24 cm to the right (6 in)
   delay(500);
   moveTo(0, 10, 0, L1, L2);
-  delay(1000);
+  delay(5000);
 }
 
 //IK function, implements trigonometry of inverse kinematics
