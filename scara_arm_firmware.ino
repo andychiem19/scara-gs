@@ -3,9 +3,9 @@
 const int stepsPerRevolution = 2048; // for stepper motor 28BYJ-48 
 
 // Initialize stepper motors
-Stepper motor1(stepsPerRevolution, 22, 24, 23, 25);
-Stepper motor2(stepsPerRevolution, 26, 28, 27, 29);
-Stepper motor3(stepsPerRevolution, 30, 32, 31, 33);
+Stepper motor1(stepsPerRevolution, 22, 23, 24, 25);
+Stepper motor2(stepsPerRevolution, 26, 27, 28, 29);
+Stepper motor3(stepsPerRevolution, 30, 31, 32, 33);
 
 //initializing electronic locking variables
 long motor1_position = 0;
@@ -77,6 +77,9 @@ void moveTo(float x, float y, float z, float L1, float L2) {
   moveMotors(s1 - motor1_position, s2 - motor2_position, s3 - motor3_position);  // delta movement
   Serial.print("deg1: "); Serial.print (deg1); Serial.println (" degrees");
   Serial.print("deg2: "); Serial.print (deg2); Serial.println (" degrees");
+  motor1_position = s1;
+  motor2_position = s2;
+  motor3_position = s3;
 }
 
 // Custom function to move all motors concurrently coordinating the steps.
