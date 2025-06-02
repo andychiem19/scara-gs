@@ -13,47 +13,34 @@ long motor2_position = 0;
 long motor3_position = 0;
 
 //function prototypes 
-bool inverseKinematics(float x, float y, float L1, float L2, float &theta1, float &theta2);
-void moveMotors(long s1, long s2, long s3);
-void moveTo(float x, float y, float L1, float L2);
 long degToSteps(float degrees);
 long zToSteps(float z);
 
 //constants
-float L1 = 11.7; // 11.7 cm from base pivot axis to joint pivot axis
-float L2 = 10.7; // 10.7 cm from joint pivot axis to end effector
+float L1 = 13.3; // 13.3 cm from base pivot axis to joint pivot axis
+float L2 = 13.3; // 13.3 cm from joint pivot axis to end effector
 
 const long verticalMinSteps = zToSteps(-18); // sets how far below neutral the end effector can move; -5 cm
 const long verticalMaxSteps = zToSteps(5);
 
 //setup function, establishes distances between pivot points
 void setup() {
+  Serial.begin(9600);
   motor1.setSpeed(10);
   motor2.setSpeed(10);
   motor3.setSpeed(10);
 
-  // calibrate to starting position (0,10)
-  moveTo(0, 10, 0, L1, L2);
-  delay(1000);
+  motor1_position = degToSteps(0);  // 0°
+  motor2_position = degToSteps(0);  // 0°
+  motor3_position = zToSteps(0);    // 0 cm height
 }
 
 //main loop, runs the two solutions repeatedly. may need to create a more robust way to select one or the other depending on the current trial
 void loop() {
-  // first test, moves a block from (in inches) (-2,2)
-  moveTo(-5.08, 15.08, 0, L1, L2); // moves above first cube, which is 5.08 cm above and to the left of the starting point
-  delay(500);
-  moveTo(7.62, 15.08, 0, L1, L2); // moves it 12.7 cm to the right (5 in) (3,2)
-  delay(500);
-  moveTo(0, 10, 0, L1, L2); // recalibrate
-  delay(5000);
-
-  // second test 
-  moveTo(-7.62, 20.16, 0, L1, L2); // moves above first cube, which is 10.16 cm above and to the left of the starting point
-  delay(500);
-  moveTo(7.62, 20.16, 0, L1, L2); // moves it 15.24 cm to the right (6 in)
-  delay(500);
-  moveTo(0, 10, 0, L1, L2);
-  delay(5000);
+  moveTo(-7,7,0,L1,L2);
+  delay(1000);
+  moveTo(5,7,0,L1,L2);
+  delay(2000);
 }
 
 //IK function, implements trigonometry of inverse kinematics
@@ -62,7 +49,7 @@ bool inverseKinematics(float x, float y, float L1, float L2, float &theta1, floa
   if (dist > L1 + L2 || dist < abs(L1 - L2)) return false; // unreachable
 
   float cos_theta2 = (x*x + y*y - L1*L1 - L2*L2) / (2 * L1 * L2);
-  theta2 = acos(cos_theta2);
+  theta2 = acos(cos_theta2); // elbow-up solution
 
   float k1 = L1 + L2 * cos(theta2);
   float k2 = L2 * sin(theta2);
@@ -88,6 +75,8 @@ void moveTo(float x, float y, float z, float L1, float L2) {
   long s3 = zToSteps(z);
 
   moveMotors(s1 - motor1_position, s2 - motor2_position, s3 - motor3_position);  // delta movement
+  Serial.print("deg1: "); Serial.print (deg1); Serial.println (" degrees");
+  Serial.print("deg2: "); Serial.print (deg2); Serial.println (" degrees");
 }
 
 // Custom function to move all motors concurrently coordinating the steps.
@@ -130,19 +119,15 @@ void moveMotors(long s1, long s2, long s3) {
   
  if ((i * steps1) / maxSteps > stepCounter1) {
       // motor1 position check
-      if ((motor1_position + dir1) <= 768 && (motor1_position + dir1) >= -768) {
-        motor1.step(dir1);
-        motor1_position += dir1;
-      }
+      motor1.step(dir1);
+      motor1_position += dir1;
       stepCounter1++;
     }
 
  if ((i * steps2) / maxSteps > stepCounter2) {
     // motor1 position check
-      if ((motor2_position + dir2) <= 768 && (motor2_position + dir2) >= -768) {
-        motor2.step(dir2);
-        motor2_position += dir2;
-      }
+      motor2.step(dir2);
+      motor2_position += dir2;
       stepCounter2++;
     }
 
