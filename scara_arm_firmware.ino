@@ -26,21 +26,23 @@ const long verticalMaxSteps = zToSteps(5);
 //setup function, establishes distances between pivot points
 void setup() {
   Serial.begin(9600);
+  delay(3000);
+  Serial.println("Setup running...");
   motor1.setSpeed(10);
   motor2.setSpeed(10);
   motor3.setSpeed(10);
 
-  motor1_position = degToSteps(0);  // 0°
-  motor2_position = degToSteps(0);  // 0°
-  motor3_position = zToSteps(0);    // 0 cm height
+  motor1_position = 0;  
+  motor2_position = 0;  
+  motor3_position = 0;  
 }
 
 //main loop, runs the two solutions repeatedly. may need to create a more robust way to select one or the other depending on the current trial
 void loop() {
-  moveTo(-7,7,0,L1,L2);
-  delay(1000);
-  moveTo(5,7,0,L1,L2);
-  delay(2000);
+  moveTo(-15,10,0,L1,L2);
+  delay(500);
+  moveTo(15,10,0,L1,L2);
+  delay(500);
 }
 
 //IK function, implements trigonometry of inverse kinematics
@@ -75,11 +77,11 @@ void moveTo(float x, float y, float z, float L1, float L2) {
   long s3 = zToSteps(z);
 
   moveMotors(s1 - motor1_position, s2 - motor2_position, s3 - motor3_position);  // delta movement
-  Serial.print("deg1: "); Serial.print (deg1); Serial.println (" degrees");
-  Serial.print("deg2: "); Serial.print (deg2); Serial.println (" degrees");
+
   motor1_position = s1;
   motor2_position = s2;
   motor3_position = s3;
+
 }
 
 // Custom function to move all motors concurrently coordinating the steps.
@@ -95,14 +97,14 @@ void moveMotors(long s1, long s2, long s3) {
  //If the target is positive, the direction variable is 1
 //If the target is negative, the direction variable is -1
  if (s1 >= 0) {
- dir1 = 1;
- } else {
  dir1 = -1;
+ } else {
+ dir1 = 1;
  }
  if (s2 >= 0) {
- dir2 = 1;
- } else {
  dir2 = -1;
+ } else {
+ dir2 = 1;
  }
  if (s3 >= 0) {
  dir3 = 1;
