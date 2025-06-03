@@ -30,17 +30,14 @@ void setup() {
   motor2.setSpeed(10);
   motor3.setSpeed(10);
 
-  motor1_position = degToSteps(0);  // 0°
-  motor2_position = degToSteps(0);  // 0°
-  motor3_position = zToSteps(0);    // 0 cm height
+  motor1_position = 0;  
+  motor2_position = 0;  
+  motor3_position = 0;  
 }
 
 //main loop, runs the two solutions repeatedly. may need to create a more robust way to select one or the other depending on the current trial
 void loop() {
-  moveTo(-7,7,0,L1,L2);
-  delay(1000);
-  moveTo(5,7,0,L1,L2);
-  delay(2000);
+  moveMotors(0,2048,0);
 }
 
 //IK function, implements trigonometry of inverse kinematics
@@ -95,14 +92,14 @@ void moveMotors(long s1, long s2, long s3) {
  //If the target is positive, the direction variable is 1
 //If the target is negative, the direction variable is -1
  if (s1 >= 0) {
- dir1 = 1;
- } else {
  dir1 = -1;
+ } else {
+ dir1 = 1;
  }
  if (s2 >= 0) {
- dir2 = 1;
- } else {
  dir2 = -1;
+ } else {
+ dir2 = 1;
  }
  if (s3 >= 0) {
  dir3 = 1;
