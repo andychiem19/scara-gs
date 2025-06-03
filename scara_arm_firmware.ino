@@ -26,6 +26,8 @@ const long verticalMaxSteps = zToSteps(5);
 //setup function, establishes distances between pivot points
 void setup() {
   Serial.begin(9600);
+  delay(3000);
+  Serial.println("Setup running...");
   motor1.setSpeed(10);
   motor2.setSpeed(10);
   motor3.setSpeed(10);
@@ -37,7 +39,10 @@ void setup() {
 
 //main loop, runs the two solutions repeatedly. may need to create a more robust way to select one or the other depending on the current trial
 void loop() {
-  moveMotors(0,2048,0);
+  moveTo(-15,10,0,L1,L2);
+  delay(500);
+  moveTo(15,10,0,L1,L2);
+  delay(500);
 }
 
 //IK function, implements trigonometry of inverse kinematics
@@ -72,11 +77,11 @@ void moveTo(float x, float y, float z, float L1, float L2) {
   long s3 = zToSteps(z);
 
   moveMotors(s1 - motor1_position, s2 - motor2_position, s3 - motor3_position);  // delta movement
-  Serial.print("deg1: "); Serial.print (deg1); Serial.println (" degrees");
-  Serial.print("deg2: "); Serial.print (deg2); Serial.println (" degrees");
+
   motor1_position = s1;
   motor2_position = s2;
   motor3_position = s3;
+
 }
 
 // Custom function to move all motors concurrently coordinating the steps.
