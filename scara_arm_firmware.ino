@@ -3,9 +3,9 @@
 const int stepsPerRevolution = 2048; // for stepper motor 28BYJ-48 
 
 // Initialize stepper motors
-Stepper motor1(stepsPerRevolution, 22, 23, 24, 25);
-Stepper motor2(stepsPerRevolution, 26, 27, 28, 29);
-Stepper motor3(stepsPerRevolution, 30, 31, 32, 33);
+Stepper motor1(stepsPerRevolution, 22, 24, 23, 25);
+Stepper motor2(stepsPerRevolution, 26, 28, 27, 29);
+Stepper motor3(stepsPerRevolution, 30, 32, 31, 33);
 
 //initializing electronic locking variables
 long motor1_position = 0;
