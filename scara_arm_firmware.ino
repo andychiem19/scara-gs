@@ -3,9 +3,9 @@
 const int stepsPerRevolution = 2048; // for stepper motor 28BYJ-48 
 
 // Initialize stepper motors
-Stepper motor1(stepsPerRevolution, 22, 23, 24, 25);
-Stepper motor2(stepsPerRevolution, 26, 27, 28, 29);
-Stepper motor3(stepsPerRevolution, 30, 31, 32, 33);
+Stepper motor1(stepsPerRevolution, 22, 24, 23, 25);
+Stepper motor2(stepsPerRevolution, 26, 28, 27, 29);
+Stepper motor3(stepsPerRevolution, 30, 32, 31, 33);
 
 //initializing electronic locking variables
 long motor1_position = 0;
@@ -37,12 +37,30 @@ void setup() {
   motor3_position = 0;  
 }
 
-//main loop, runs the two solutions repeatedly. may need to create a more robust way to select one or the other depending on the current trial
+//main loop, runs the two solutions repeatedly. place the front of the robot centered on the square we intend to be (0,0) (in reality it will be (0,4.2))
 void loop() {
-  moveTo(-15,10,0,L1,L2);
+
+  // Solution #1
+  moveTo(7.62, 11.8, -6, L1, L2); // moves to pick up block1
+  delay(1000);
+  moveTo(-5.08, 11.8, 0, L1, L2); // moves above final pos1
   delay(500);
-  moveTo(15,10,0,L1,L2);
+  moveTo(-5.08, 11.8, -6, L1, L2); // puts block1 down
   delay(500);
+  moveTo(-5.08, 11.8, 0, L1, L2); // lifts back to default height
+  delay(500);
+
+  // Solution #2
+  moveTo(7.62, 16.88, -6, L1, L2); // moves to pick up block 2
+  delay(1000);
+  moveTo(-7.62, 16.88, 0, L1, L2); // moves above final pos2
+  delay(500);
+  moveTo(-7.62, 16.88, -6, L1, L2); // puts block 2 down
+  delay(500);
+  moveTo(-7.62, 16.88, 0, L1, L2); // lifts back to default height
+  delay(500);
+
+  delay(5000);
 }
 
 //IK function, implements trigonometry of inverse kinematics
@@ -64,7 +82,10 @@ bool inverseKinematics(float x, float y, float L1, float L2, float &theta1, floa
 void moveTo(float x, float y, float z, float L1, float L2) {
   float t1, t2;
   if (!inverseKinematics(x, y, L1, L2, t1, t2)) {
-    return;
+    Serial.println("Target out of reach!");
+    while (true) {
+      // aborts motion until manual reset
+    }
   }
 
   // Convert radians to degrees
@@ -81,7 +102,6 @@ void moveTo(float x, float y, float z, float L1, float L2) {
   motor1_position = s1;
   motor2_position = s2;
   motor3_position = s3;
-
 }
 
 // Custom function to move all motors concurrently coordinating the steps.
