@@ -1,24 +1,35 @@
-# SCARA Robot Arm (Arduino / C++)
+**SCARA Robot Arm**  
+*Arduino / C++ Implementation*
 
-This project implements inverse kinematics and coordinated stepper motor control in Arduino to consistently and precisely move an end effector to a desired position. 
+This project applies inverse kinematics and coordinated stepper motor control to move a SCARA arm's end effector to target positions with consistent precision.
 
-## Features
+---
 
-- Inverse kinematics to convert a desired (x,y) position in cm to stepper motor rotation steps
-- Coordinated motor stepping function
-- Electronic limiting
+**Features**
 
-## Structure
+- Inverse kinematics to convert (x, y) coordinates into stepper motor steps
+- Coordinated motor stepping with timing and direction control
+- Basic electronic limiting to prevent overextension
 
-- `main/`: Main branch of microcontroller code
-- `develop/`: Actively developed, merged into main when compiled and tested
+---
 
-## Tools used
+**Repository Structure**
 
-- Arduino IDE
-- Fritzing
+- `main/` — Stable microcontroller code for deployment
+- `develop/` — Work-in-progress code, merged into `main` after successful testing
 
-## To-do
-//Not actively being worked on
-- Implement start position homing using limit switches
-- Implement forward kinematics to determine current position of end effector
+---
+
+**Tools Used**
+
+- Arduino IDE (C++)
+- Fritzing (for wiring diagrams and documentation)
+
+---
+
+**Planned Improvements**
+
+*(Not actively under development)*
+
+- Add homing routine using limit switches
+- Implement forward kinematics to calculate end effector position
