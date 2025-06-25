@@ -13,13 +13,6 @@ This project applies inverse kinematics and coordinated stepper motor control to
 
 ---
 
-**Repository Structure**
-
-- `main/` — Stable microcontroller code for deployment
-- `develop/` — Work-in-progress code, merged into `main` after successful testing
-
----
-
 **Tools Used**
 
 - Arduino IDE (C++)
