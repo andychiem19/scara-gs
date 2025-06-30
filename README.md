@@ -1,3 +1,6 @@
+> [!NOTE]
+> This project is not currently under development.
+
 ### SCARA Robot Firmware - ENGR113
 
 This project applies inverse kinematics and coordinated stepper motor control to move a SCARA arm's end effector to target positions with consistent precision.
@@ -22,9 +25,6 @@ This project applies inverse kinematics and coordinated stepper motor control to
 - ---
 
 #### **Future Extensions**
-
-> [!NOTE]
-> This project is not currently under development.
 
 - Add homing routine using limit switches
 - Implement forward kinematics to calculate end effector position
