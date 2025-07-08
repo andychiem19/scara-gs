@@ -9,7 +9,6 @@ This project applies inverse kinematics and coordinated stepper motor control to
 
 **Tools Used**
 
-`Arduino IDE`
 `Arduino`
 `C++`
 `Fritzing`
